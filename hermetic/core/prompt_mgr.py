@@ -19,7 +19,7 @@ class Prompt():
 
 
 class PromptMgr():
-    def __init__(self, hot_reload: bool = True, src_dir: str = 'prompts'):
+    def __init__(self, hot_reload: bool = True, src_dir: str = 'resources/prompts'):
         """ Creates a prompt manager. 
 
         Args:

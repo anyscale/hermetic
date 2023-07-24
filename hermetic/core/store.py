@@ -1,12 +1,20 @@
 from abc import ABC, abstractmethod
 from hermetic.core.message import Message
+from pydantic import BaseModel
 
-class TraceStore(ABC):
-    
+
+class Trace(ABC):
     @abstractmethod
-    def create_trace(self, trace_id: str) -> Trace: 
+    def append_to_trace(self, message: Message): 
         pass
     
-    def append_to_trace(self, message: Message)
 
+  
 class Store(ABC):
+    
+    def set_environment(self, environment):
+        self.env = environment
+
+    @abstractmethod
+    def create_trace(self, trace_id: str) -> Trace: 
+       pass

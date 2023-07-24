@@ -24,13 +24,11 @@ class Agent(ABC):
     def process_input(self, input: Input) -> str:
         pass
 
+    def __init__(self, environment):
+        self.env = environment
+
     def greet(self):
         return None
-
-class Presenter(ABC):
-    @abstractmethod
-    def present(self, agent: Agent):
-        pass
         
 
 

@@ -26,5 +26,5 @@ class Message(BaseModel):
     """
     role: Role
     content: str
-    metadata: dict = {}
+    metadata: dict = {} # for things like tokens
     annotations: List[Annotation] = []  
