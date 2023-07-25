@@ -24,12 +24,9 @@ class Agent(ABC):
     def process_input(self, input: Input) -> str:
         pass
 
-<<<<<<< HEAD
-=======
     def process_all(self, input: str) -> str:
         return ''.join(self.process_input(Input(input=input)))
 
->>>>>>> 0f791f9 (First semi-complete version.)
     def __init__(self, environment):
         self.env = environment
 
