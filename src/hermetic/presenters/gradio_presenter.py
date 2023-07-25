@@ -15,9 +15,12 @@ CSS ="""
 class GradioPresenter(Presenter): 
     def __init__(self, 
                 app_name: str = 'Hermetic',
-                news: str = ''):
+                news: str = '',
+                favicon_path: str = None):
+
         self.app_name = app_name
         self.news = news
+        self.favicon_path = favicon_path
         
     def present(self, agent):
         self.agent = agent
@@ -50,7 +53,10 @@ class GradioPresenter(Presenter):
                     outputs=[chatbot, agent])
 
         app.queue(concurrency_count=8)
-        app.launch()
+        if self.favicon_path:
+            app.launch(favicon_path=self.favicon_path)
+        else:
+            app.launch()
 
 
 
