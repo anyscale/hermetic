@@ -13,10 +13,10 @@ class ToolResult(BaseModel):
 
 class Tool(ABC):
 
+    def __init__(self, env):
+        self.env = env
+
     @abstractmethod
     def run(self, input: str, **kwargs) -> Union[str, List[ToolResult]]:
         pass
-
-    def set_environment(self, environment):
-        self.env = environment
 
