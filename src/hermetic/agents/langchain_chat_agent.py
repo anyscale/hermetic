@@ -3,7 +3,7 @@ from hermetic.core.agent import Agent, InputMarker
 from abc import abstractmethod
 from langchain.chat_models import ChatOpenAI
 from langchain.callbacks.base import BaseCallbackHandler
-from queue import SimpleQueue
+from queue import Queue
 from threading import Thread
 import sys
 
@@ -12,25 +12,24 @@ from langchain.schema import (
     HumanMessage,
     SystemMessage
 )
-
-class StreamingCBH(BaseCallbackHandler):
-    def __init__(self, q):
-        self.q = q
-
-    def on_llm_new_token(
-        self,
-        token,
-        *,
-        run_id,
-        parent_run_id = None,
-        **kwargs,
-    ) -> None:
-        self.q.put(token)
-    
-    def on_llm_end(self, response, *, run_id, parent_run_id, **kwargs):
-        self.q.put(InputMarker.END)
-
+         
 class LangchainChatAgent(Agent):
+    class StreamingCBH(BaseCallbackHandler):
+        def __init__(self, q):
+            self.q = q
+
+        def on_llm_new_token(
+            self,
+            token,
+            *,
+            run_id,
+            parent_run_id = None,
+            **kwargs,
+        ) -> None:
+            self.q.put(token)
+        
+        def on_llm_end(self, response, *, run_id, parent_run_id, **kwargs):
+            self.q.put(InputMarker.END)
 
     def set_llm(self, llm):
         self.llm = llm
@@ -38,21 +37,18 @@ class LangchainChatAgent(Agent):
     def __init__(self, environment, id: str = None):
         super().__init__(environment, id=id)
         self.message_history = []
-        self.q = SimpleQueue()
 
     def greet(self):
         return None
-    
-    def get_queue(self):
-        return self.q
 
     def process_input(self, input: str):
-        self.message_history.append(HumanMessage(content=input))
-        thread =  Thread(target = self.llm.predict_messages, kwargs = {'messages': self.message_history})
+        self.update_message_history(input)
+        myq = Queue()
+        thread =  Thread(target = self.llm.predict_messages, kwargs = {'messages': self.message_history, 'callbacks': [self.StreamingCBH(myq)]})
         thread.start() 
         words = ''
         while True: 
-            token = self.q.get()
+            token = myq.get()
             if token == InputMarker.END:
                break
             words += token 
@@ -65,9 +61,6 @@ class LangchainChatAgent(Agent):
         Subclasses of OpenAIChatAgent may want to override this
         method to do things like add metadata to the message history
         """
-        self.message_history.append({
-            'role': 'user',
-            'content': inp
-        })
+        self.message_history.append(HumanMessage(content=inp))
 
         
