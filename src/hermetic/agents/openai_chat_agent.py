@@ -4,8 +4,8 @@ from abc import abstractmethod
 
 class OpenAIChatAgent(Agent):
 
-    def __init__(self, model: str, environment):
-        super().__init__(environment)
+    def __init__(self, model: str, environment, id: str = None):
+        super().__init__(environment, id=id)
         self.message_history = []
         self.model = model 
 
