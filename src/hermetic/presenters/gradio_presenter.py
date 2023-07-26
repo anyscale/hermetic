@@ -4,6 +4,7 @@ from hermetic.core.presenter import Presenter
 from threading import Thread
 from queue import SimpleQueue
 from langchain.callbacks.base import BaseCallbackHandler
+from hermetic.core.environment import Environment
 import uuid
 
 CSS ="""
@@ -14,16 +15,19 @@ CSS ="""
 
 class GradioPresenter(Presenter): 
     def __init__(self, 
+                env: Environment, 
                 app_name: str = 'Hermetic',
                 news: str = '',
-                favicon_path: str = None):
+                favicon_path: str = None,
+):
 
         self.app_name = app_name
         self.news = news
         self.favicon_path = favicon_path
+        self.env = env
         
-    def present(self, agent):
-        self.agent = agent
+    def present(self):
+        self.agent = self.env.agents[self.env.primary_agent]
         with gr.Blocks(title=self.app_name, css=CSS) as app:
             greeting = self.agent.greet()
             conv_start = []

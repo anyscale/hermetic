@@ -19,6 +19,7 @@ class Role(Enum):
     USER = "user"
     SYSTEM = "system"
     AI = "ai"
+    INTERNAL = "internal"
 
 class Message(BaseModel):
     """

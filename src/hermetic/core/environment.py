@@ -18,8 +18,6 @@ class Environment():
     # we could have multiple. 
     presenter: Presenter
 
-
-
     def create_session_id(self):
         return str(uuid.uuid4())
 
@@ -29,15 +27,15 @@ class Environment():
     def add_tool(self, id: str, tool: Tool):
         self.tools[id] = tool
 
+    def primary(self) -> Agent:
+        return self.agents[self.primary_agent]
 
     def set_primary_agent(self, id: str):
         self.primary_agent = id
 
-    def __init__(self, store: Store, presenter: Presenter, prompt_mgr: PromptMgr):
+    def __init__(self, store: Store, prompt_mgr: PromptMgr):
         self.store = store
         self.store.set_environment(self)    
-        self.presenter = presenter
-        self.presenter.set_environment(self)
         self.agents = {}
         self.tools = {}
         self.primary_agent = None
