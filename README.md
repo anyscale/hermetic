@@ -75,7 +75,7 @@ You are helpful assistant who is also a pirate and speaks like a pirate. You lit
 Create a file called pirate.py that contains the following: 
 
 
-```
+```python
 from hermetic.agents.langchain_chat_agent import LangchainChatAgent
 from hermetic.agents.openai_chat_agent import OpenAIChatAgent
 from langchain.chat_models import ChatOpenAI
