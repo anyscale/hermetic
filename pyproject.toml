@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 
 [project]
 name = "hermetic"
-version = "0.0.6"
+version = "0.0.7"
 description = "A tool to simplify developing, testing, evaluating and deploying LLMs"
 authors = [
     {name = "M Waleed Kadous", email = "mwk@anyscale.com"}
@@ -11,7 +11,7 @@ authors = [
 dependencies = [
     "openai",
     "langchain",
-    "gradio==3.21.0",
+    "gradio>=3.21.0",
     "pymongo",
     "pyyaml"
 ]
