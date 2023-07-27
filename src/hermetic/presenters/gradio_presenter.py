@@ -8,9 +8,10 @@ from hermetic.core.environment import Environment
 import uuid
 
 CSS ="""
-.contain { display: flex; flex-direction: column; }x
+.contain { display: flex; flex-direction: column; }
 #component-0 { height: 100%; }
-#chatbot { flex-grow: 1; }
+#chatbot { flex-grow: 1; overflow: auto;}
+#chatbot .wrap {max-height: 700px; overflow: auto;}} 
 """
 
 class GradioPresenter(Presenter): 
