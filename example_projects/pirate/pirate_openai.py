@@ -20,7 +20,6 @@ class Pirate(OpenAIChatAgent):
         
         # bind to the system message
         sys_msg = self.pm.bind('system_msg')
-        self.llm = ChatOpenAI(temperature=0, model_name=MODEL, streaming=True)
 
         # Let's add our system message to the message history
         #self.message_history = [SystemMessage(content=sys_msg.render())]
