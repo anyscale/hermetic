@@ -1,11 +1,10 @@
-from hermetic.agents.langchain_chat_agent import LangchainChatAgent
-from hermetic.agents.openai_chat_agent import OpenAIChatAgent
 from langchain.chat_models import ChatOpenAI
-from langchain.schema import SystemMessage, HumanMessage 
-from hermetic.core.prompt_mgr import PromptMgr
-from hermetic.core.environment import Environment
-from hermetic.presenters.gradio_presenter import GradioPresenter
+from langchain.schema import HumanMessage, SystemMessage
 
+from hermetic.agents.langchain_chat_agent import LangchainChatAgent
+from hermetic.core.environment import Environment
+from hermetic.core.prompt_mgr import PromptMgr
+from hermetic.presenters.gradio_presenter import GradioPresenter
 
 NAME = 'pirate'
 MODEL = 'meta-llama/Llama-2-7b-chat-hf'
@@ -20,6 +19,8 @@ class Pirate(LangchainChatAgent):
         
         # bind to the system message
         sys_msg = self.pm.bind('system_msg')
+
+        # Temperature set to 0.001 rather than 0 to deal with Endpoint bug. 
         self.llm = ChatOpenAI(temperature=0.001, model_name=MODEL, streaming=True)
 
         # Let's add our system message to the message history
