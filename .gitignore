@@ -4,4 +4,3 @@ share/
 .env
 *.pyc
 pyvenv.cfg
-example_projects/

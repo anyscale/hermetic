@@ -27,7 +27,6 @@ class LangchainChatAgent(Agent):
             parent_run_id = None,
             **kwargs,
         ) -> None:
-            print(f'New token: {token}')
             self.q.put(token)
         
         def on_llm_end(self, response, *, run_id, parent_run_id, **kwargs):
@@ -48,10 +47,8 @@ class LangchainChatAgent(Agent):
         myq = Queue()
         thread =  Thread(target = self.llm.predict_messages, kwargs = {'messages': self.message_history, 'callbacks': [self.StreamingCBH(myq)]})
         thread.start() 
-        print('thread started')
         words = ''
         while True: 
-            print('waiting for token')
             token = myq.get()
             if token == InputMarker.END:
                break
