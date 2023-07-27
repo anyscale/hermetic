@@ -132,3 +132,20 @@ Let's run it!
 ```
 
 Now connect to localhost:7860 in your browser and you should be able to talk to a pirate! 
+
+## Deep dive
+
+### Core concepts
+
+__Agent__: An agent is code that processes user input. It's a superset of LLM chains and Langchain Agents. 
+__Environment__: Agents run in an environment. The environment includes prompts, any memory beyond that for the current conversation, agents and tools. 
+__Tool__: A tool is a connection to an online service that offers an API. 
+__Presenter__: A presenter is something that takes an agent and connects it to a source of input. Examples include GradioPresenter, StdioPresenter, SlackPresenter and EvalPresenter. 
+
+
+Hermetic is an approach to LLM development and deployment. It builds on a few key principles: 
+
+1. Agents should be separated from their environment and presenter. This maximizes reusability and testability. 
+2. Agents should do only one thing. 
+3. By creating different environments containing the same agents, we can do effective evaluations. 
+4. You should be able to deploy an environment and everything in it into production. 
