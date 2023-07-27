@@ -33,7 +33,7 @@ class Environment():
     def set_primary_agent(self, id: str):
         self.primary_agent = id
 
-    def __init__(self, prompt_mgr: PromptMgr,store: Store = None)):
+    def __init__(self, prompt_mgr: PromptMgr,store: Store = None):
         self.store = store
         if self.store:
             self.store.set_environment(self)    
