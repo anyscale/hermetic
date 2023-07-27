@@ -133,5 +133,10 @@ presenter = GradioPresenter(app_name='Pirate',
 presenter.present()
 ```
 
+Let's run it! 
+
+```
+% python pirate.py
+```
 
 Now connect to localhost:7860 in your browser and you should be able to talk to a pirate! 
