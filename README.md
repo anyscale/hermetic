@@ -14,7 +14,7 @@ These particular instructions are focused on Anyscale Endpoints, but they should
 
 Before you get started, you’ll need an Anyscale Endpoints key. You can get that from [https://console.endpoints.anyscale.com/credentials](https://console.endpoints.anyscale.com/credentials) (after you’ve entered your credit card). 
 
-**Make sure you save this – it is only given once. **
+__Make sure you save this – it is only given once.__
 
 You also need a clean python environment. 
 
@@ -37,17 +37,14 @@ We need quite a few environment variables to get this demo working, so the easie
 
 Add the following lines there: 
 
-
 ```
 export OPENAI_API_BASE=https://console.endpoints.anyscale.com/m/v1
 export OPENAI_API_KEY=secret_<your secret> 
 ```
 
+__NOTE__:It may seem weird that we are defining OPENAI_API_* variables when we want to connect to Anyscale. But this is because Anyscale offers an OpenAI compatible api. Note that you did not need to install any libraries to use Anyscale Endpoints specifically, it reuses the OpenAI python SDK. 
 
-**NOTE: **It may seem weird that we are defining OPENAI_API_* variables when we want to connect to Anyscale. But this is because Anyscale offers an OpenAI compatible api. Note that you did not need to install any libraries to use Anyscale Endpoints specifically, it reuses the OpenAI python SDK. 
-
-And now to load them 
-
+And now to load them: 
 
 ```
 % source .env
@@ -86,7 +83,7 @@ from hermetic.presenters.gradio_presenter import GradioPresenter
 
 NAME = 'pirate'
 MODEL = 'meta-llama/Llama-2-7b-chat-hf'
-#MODEL = 'gpt-3.5-turbo'
+
 class Pirate(LangchainChatAgent):
 
     def __init__(self, env):
