@@ -11,7 +11,7 @@ authors = [
 dependencies = [
     "openai",
     "langchain",
-    "gradio",
+    "gradio==3.21.0",
     "pymongo",
     "pyyaml"
 ]
