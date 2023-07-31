@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 
 [project]
 name = "hermetic"
-version = "0.0.9"
+version = "0.0.10"
 description = "A tool to simplify developing, testing, evaluating and deploying LLMs"
 authors = [
     {name = "M Waleed Kadous", email = "mwk@anyscale.com"}
