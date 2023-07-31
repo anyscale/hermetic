@@ -10,6 +10,7 @@ from langchain.callbacks import LangChainTracer
 from queue import Queue
 from threading import Thread
 import sys
+import uuid
 
 from langchain.schema import (
     AIMessage,
@@ -45,6 +46,8 @@ class LangchainChatAgent(Agent):
     def __init__(self, environment, id: str = None):
         super().__init__(environment, id)
         self.message_history = []
+        self.session_tag = f'session_{uuid.uuid4()}'
+
 
     def greet(self):
         return None
@@ -53,7 +56,7 @@ class LangchainChatAgent(Agent):
         self.update_message_history(input)
         myq = Queue()
         thread =  Thread(target = self.llm.predict_messages, kwargs = 
-                        {'messages': self.message_history, 'callbacks': [self.StreamingCBH(myq)]})
+                        {'messages': self.message_history, 'tags': [self.session_tag], 'callbacks': [self.StreamingCBH(myq)]})
         thread.start() 
         words = ''
         while True: 
