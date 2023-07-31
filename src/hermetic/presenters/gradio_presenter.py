@@ -53,6 +53,7 @@ class GradioPresenter(Presenter):
             def user(user_message, history, my_uuid):
                 if self.instances.get(my_uuid) is None:
                     self.instances[my_uuid] = copy.deepcopy(self.agent)
+                    self.instances[my_uuid].session_tag = f'ses_{my_uuid}'
                     self.histories[my_uuid] =[['', self.agent.greet()]]
                 self.histories[my_uuid].append([user_message,None])
                 print('history is ', self.histories[my_uuid])
@@ -62,6 +63,7 @@ class GradioPresenter(Presenter):
                 # Check if we've seen this uuid before. If not, greet then add to instances
                 if self.instances.get(my_uuid) is None:
                     self.instances[my_uuid] = copy.deepcopy(self.agent)
+                    self.instances[my_uuid].session_tag = f'ses_{my_uuid}'
                     self.histories[my_uuid] =[['', self.agent.greet()]]
                 instance = self.instances[my_uuid]                    
                 history = self.histories[my_uuid]
