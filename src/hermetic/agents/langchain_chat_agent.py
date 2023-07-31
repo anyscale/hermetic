@@ -1,8 +1,12 @@
+from typing import Any, Dict, List, Optional
+from uuid import UUID
+from langchain.schema.messages import BaseMessage
 import openai
 from hermetic.core.agent import Agent, InputMarker
 from abc import abstractmethod
 from langchain.chat_models import ChatOpenAI
 from langchain.callbacks.base import BaseCallbackHandler
+from langchain.callbacks import LangChainTracer
 from queue import Queue
 from threading import Thread
 import sys
@@ -12,12 +16,14 @@ from langchain.schema import (
     HumanMessage,
     SystemMessage
 )
-         
+
 class LangchainChatAgent(Agent):
+
     class StreamingCBH(BaseCallbackHandler):
         def __init__(self, q):
             self.q = q
             print('Queue created')
+                
 
         def on_llm_new_token(
             self,
@@ -35,17 +41,19 @@ class LangchainChatAgent(Agent):
     def set_llm(self, llm):
         self.llm = llm
 
+
     def __init__(self, environment, id: str = None):
-        super().__init__(environment, id=id)
+        super().__init__(environment, id)
         self.message_history = []
 
     def greet(self):
         return None
 
-    def process_input(self, input: str):
+    def process_input(self, input):
         self.update_message_history(input)
         myq = Queue()
-        thread =  Thread(target = self.llm.predict_messages, kwargs = {'messages': self.message_history, 'callbacks': [self.StreamingCBH(myq)]})
+        thread =  Thread(target = self.llm.predict_messages, kwargs = 
+                        {'messages': self.message_history, 'callbacks': [self.StreamingCBH(myq)]})
         thread.start() 
         words = ''
         while True: 

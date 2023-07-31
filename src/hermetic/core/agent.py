@@ -14,17 +14,13 @@ class InputMarker(Enum):
     CANCEL = '-- CANCEL --'
     END = '-- END --'
 
-class Input(BaseModel):
-    input: Union[InputMarker, str]
-
-
 class Agent(ABC):
     @abstractmethod
-    def process_input(self, input: Input) -> str:
+    def process_input(self, input: str) -> str:
         pass
 
     def process_all(self, input: str) -> str:
-        return ''.join(self.process_input(Input(input=input)))
+        return ''.join(self.process_input(input))
 
     def __init__(self, environment, primary: bool = False, id: str = None):
         self.env = environment

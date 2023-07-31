@@ -14,7 +14,7 @@ class Prompt():
         if (self.cached is None) or (self.hot_reload):
             with open(self.file_path, 'r') as f:
                 self.cached = f.read()
-        
+        print (f'kwargs is {kwargs}')
         return self.cached.format(**kwargs)
 
 
