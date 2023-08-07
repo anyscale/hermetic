@@ -55,7 +55,7 @@ class LangchainChatAgent(Agent):
     def process_input(self, input):
         self.update_message_history(input)
         myq = Queue()
-        thread =  Thread(target = self.llm.predict_messages, kwargs = 
+        thread =  Thread(target = self.llm.run, kwargs = 
                         {'messages': self.message_history, 'tags': [self.session_tag], 'callbacks': [self.StreamingCBH(myq)]})
         thread.start() 
         words = ''
