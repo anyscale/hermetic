@@ -4,7 +4,8 @@ from hermetic.core.agent import Agent
 from hermetic.core.tool import Tool, ToolResult
 from hermetic.core.prompt_mgr import PromptMgr
 from typing import Any, List, Dict
-import uuid 
+import uuid
+import os
 
 class Environment():
     store: Store
@@ -42,10 +43,16 @@ class Environment():
         self.primary_agent = None
         self.prompt_mgr = prompt_mgr 
 
-
-
     def start(self):
         agent = self.agents[self.primary_agent]
         self.presenter.present(agent)
 
+def load_environments(root_dir: str = 'resources/environments'):
+    dirs = [d for d in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir, d)) and not d.startswith('.')]
+    retval = {}
+    for d in dirs:
+        retval[d] = Environment(PromptMgr(src_dir=root_dir + '/' + d + '/prompts'))
+    return retval 
+
+        
     

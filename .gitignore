@@ -4,3 +4,5 @@ share/
 .env
 *.pyc
 pyvenv.cfg
+.ipynb_checkpoints/
+
