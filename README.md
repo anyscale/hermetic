@@ -4,6 +4,8 @@
 
 Hermetic is a library that makes it easy to develop, test, evaluate and deploy LLM Applications. 
 
+**Note**: Hermetic is still experimental. In particular the APIs may change as we learn more about what works or doesn't. 
+
 
 # Quick start guide
 
