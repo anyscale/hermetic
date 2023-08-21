@@ -13,5 +13,7 @@ dependencies = [
     "langchain",
     "gradio>=3.21.0",
     "pymongo",
-    "pyyaml"
+    "pyyaml",
+    "python-dotenv", 
+    "tiktoken"
 ]
