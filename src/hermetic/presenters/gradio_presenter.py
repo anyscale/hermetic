@@ -14,7 +14,6 @@ CSS ="""
 .contain { display: flex; flex-direction: column; }
 #component-0 { height: 100%; flex-grow: 1; }
 #chatbot { flex-grow: 1; overflow: auto;}
-#component-5 { flex-grow: 0; }
 """
 
 class GradioPresenter(Presenter): 
@@ -38,6 +37,12 @@ class GradioPresenter(Presenter):
 
         def generate_session_id():
             return str(f'{uuid.uuid4()}')
+        
+        def append_flag(msg):
+            msg = msg + 'Please flag this. '
+
+        def clear_contents(msg):
+            return ''
 
         with gr.Blocks(title=self.app_name, css=CSS) as app:
             # Note: Gradio Presenter is incredibly confusing. 
@@ -48,9 +53,11 @@ class GradioPresenter(Presenter):
 
 
             chatbot = gr.Chatbot([['', self.agent.greet()]], elem_id="chatbot")
+            msg = gr.Textbox(show_label=False, scale=10) 
             with gr.Row():
-                msg = gr.Textbox(show_label=False, scale=6) 
-                btn = gr.Button(value="Send", size="sm", scale=1, variant="secondary")
+                clr = gr.Button(value="Clear", size="sm", scale=1, variant="secondary", elem_id="clr")
+                btn = gr.Button(value="Send", size="sm", scale=2, variant="primary", elem_id="btn")
+
 
             def user(user_message, history, my_uuid):
                 if self.instances.get(my_uuid) is None:
@@ -90,6 +97,11 @@ class GradioPresenter(Presenter):
                     fn=bot, 
                     inputs=[chatbot, my_uuid],
                     outputs=[chatbot, my_uuid])
+            
+            clr.click(fn=clear_contents,
+                    inputs=[msg], 
+                    outputs=[msg], 
+                    queue = False)
 
         app.queue(concurrency_count=8)
         if self.favicon_path:
