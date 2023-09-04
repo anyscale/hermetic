@@ -50,7 +50,7 @@ class GradioPresenter(Presenter):
             chatbot = gr.Chatbot([['', self.agent.greet()]], elem_id="chatbot")
             with gr.Row():
                 msg = gr.Textbox(show_label=False, scale=6) 
-                btn = gr.Button(value="Send", size="sm", scale=1)
+                btn = gr.Button(value="Send", size="sm", scale=1, variant="secondary")
 
             def user(user_message, history, my_uuid):
                 if self.instances.get(my_uuid) is None:
