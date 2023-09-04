@@ -48,7 +48,9 @@ class GradioPresenter(Presenter):
 
 
             chatbot = gr.Chatbot([['', self.agent.greet()]], elem_id="chatbot")
-            msg = gr.Textbox(show_label=False) 
+            with gr.Row():
+                msg = gr.Textbox(show_label=False, scale=6) 
+                btn = gr.Button(value="Send", size="sm", scale=1)
 
             def user(user_message, history, my_uuid):
                 if self.instances.get(my_uuid) is None:
@@ -75,6 +77,14 @@ class GradioPresenter(Presenter):
                     yield history, my_uuid
                  
             msg.submit(fn=user, 
+                    inputs=[msg, chatbot, my_uuid], 
+                    outputs=[msg, chatbot, my_uuid], queue=False).then(
+                    fn=bot, 
+                    inputs=[chatbot, my_uuid],
+                    outputs=[chatbot, my_uuid])
+            
+            # Clicking on the button does the same thing as submitting.
+            btn.click(fn=user, 
                     inputs=[msg, chatbot, my_uuid], 
                     outputs=[msg, chatbot, my_uuid], queue=False).then(
                     fn=bot, 
