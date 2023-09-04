@@ -12,9 +12,9 @@ from langchain.callbacks.manager import trace_as_chain_group
 
 CSS ="""
 .contain { display: flex; flex-direction: column; }
-#component-0 { height: 100%; }
+#component-0 { height: 100%; flex-grow: 1; }
 #chatbot { flex-grow: 1; overflow: auto;}
-#chatbot .wrap {max-height: 700px; overflow: auto;}} 
+#component-5 { flex-grow: 0; }
 """
 
 class GradioPresenter(Presenter): 
