@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, Callable, Tuple
 from uuid import UUID
 from langchain.schema.messages import BaseMessage
 import openai
@@ -42,25 +42,27 @@ class LangchainChatAgent(Agent):
     class MessageHistory:
         def __int__(
                 self,
-                agent: "LangchainChatAgent",
-                messages: Optional[List[Union[AIMessage, HumanMessage, SystemMessage]]] = []):
-            self._agent = agent
+                on_message_history_append: Callable[[Union[AIMessage, HumanMessage, SystemMessage]], BaseMessage],
+                messages: Optional[List[Union[AIMessage, HumanMessage, SystemMessage]]] = [],
+        ):
+            self._on_message_history_append = on_message_history_append
             self._messages: List[Union[AIMessage, HumanMessage, SystemMessage]] = []
             for msg in messages:
                 self.append(msg)  # So that the `on_message_history_append` callback is called.
 
         @property
-        def messages(self):
-            return self._messages
+        def messages(self) -> Tuple[Union[AIMessage, HumanMessage, SystemMessage], ...]:
+            return tuple(self._messages)
 
         def append(self, msg: Union[AIMessage, HumanMessage, SystemMessage]) -> None:
+            msg = self._on_message_history_append(msg)
+            assert msg, "Empty return from `on_message_history_append`, did you forget to return the message passed in?"
             self._messages.append(msg)
-            self._agent.on_message_history_append(msg)
 
     def __init__(self, environment, id: str = None):
         super().__init__(environment, id)
         self.session_tag = f'session_{uuid.uuid4()}'
-        self._message_history = LangchainChatAgent.MessageHistory(agent=self)
+        self._message_history = LangchainChatAgent.MessageHistory(self.on_message_history_append)
         self._llm = None
 
     @property
@@ -69,7 +71,7 @@ class LangchainChatAgent(Agent):
 
     @message_history.setter
     def message_history(self, messages: List[Union[AIMessage, HumanMessage, SystemMessage]]):
-        self._message_history = LangchainChatAgent.MessageHistory(agent=self, messages=messages)
+        self._message_history = LangchainChatAgent.MessageHistory(self.on_message_history_append, messages=messages)
 
     @property
     def llm(self):
@@ -116,9 +118,11 @@ class LangchainChatAgent(Agent):
     def on_message_history_append(self, msg: Union[AIMessage, HumanMessage, SystemMessage]):
         """Subclasses can override to update their state whenever a new message is appended to the `message_history`.
 
-        :param msg: The message that was appended to the message_history. Should be the same instance as message[-1].
+        :param msg: The message that was passed to the `message_history.append`. This method is allowed to modify it.
+
+        :return: The message to be actually appended to the `message_history.messages`.
         """
-        pass
+        return msg
 
     def create_predict_messages_callbacks(self) -> List:
         """Subclasses can override to create callbacks for the LLM's predict_messages method."""
