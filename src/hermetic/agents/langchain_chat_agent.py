@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 from uuid import UUID
 from langchain.schema.messages import BaseMessage
 import openai
@@ -39,6 +39,32 @@ class LangchainChatAgent(Agent):
         def on_llm_end(self, response, *, run_id, parent_run_id, **kwargs):
             self.q.put(InputMarker.END)
 
+    class MessageHistory:
+        def __int__(
+                self,
+                agent: "LangchainChatAgent",
+                messages: Optional[List[Union[AIMessage, HumanMessage, SystemMessage]]] = None):
+            self._agent = agent
+            self._messages: List[Union[AIMessage, HumanMessage, SystemMessage]] = messages[:] if messages else []
+
+        def append(self, msg: Union[AIMessage, HumanMessage, SystemMessage]) -> None:
+            self._messages.append(msg)
+            self._agent.on_message_history_updated()
+
+    def __init__(self, environment, id: str = None):
+        super().__init__(environment, id)
+        self.session_tag = f'session_{uuid.uuid4()}'
+        self._message_history = LangchainChatAgent.MessageHistory(agent=self)
+        self._llm = None
+
+    @property
+    def message_history(self):
+        return self._message_history._messages
+
+    @message_history.setter
+    def message_history(self, messages):
+        self._message_history = LangchainChatAgent.MessageHistory(agent=self, messages=messages)
+
     @property
     def llm(self):
         """Return the LLM to be used for a prediction upon calling process_input.
@@ -50,12 +76,6 @@ class LangchainChatAgent(Agent):
     def llm(self, llm):
         """If you don't override the `llm` property, make sure to assign an LLM to it before calling `process_input`."""
         self._llm = llm
-
-    def __init__(self, environment, id: str = None):
-        super().__init__(environment, id)
-        self.message_history = []
-        self.session_tag = f'session_{uuid.uuid4()}'
-        self._llm = None
 
     def greet(self):
         return None
@@ -83,4 +103,6 @@ class LangchainChatAgent(Agent):
         """
         self.message_history.append(HumanMessage(content=inp))
 
-        
+    def on_message_history_updated(self):
+        """Subclasses can override to update their state whenever a new message is appended to the `message_history`."""
+        pass
