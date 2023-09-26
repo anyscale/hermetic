@@ -47,9 +47,14 @@ class LangchainChatAgent(Agent):
             self._agent = agent
             self._messages: List[Union[AIMessage, HumanMessage, SystemMessage]] = messages[:] if messages else []
 
+        @property
+        def messages(self):
+            return self._messages
+
         def append(self, msg: Union[AIMessage, HumanMessage, SystemMessage]) -> None:
             self._messages.append(msg)
-            self._agent.on_message_history_updated()
+            self._agent.on_message_history_append()
+
 
     def __init__(self, environment, id: str = None):
         super().__init__(environment, id)
@@ -59,10 +64,10 @@ class LangchainChatAgent(Agent):
 
     @property
     def message_history(self):
-        return self._message_history._messages
+        return self._message_history
 
     @message_history.setter
-    def message_history(self, messages):
+    def message_history(self, messages: List[Union[AIMessage, HumanMessage, SystemMessage]]):
         self._message_history = LangchainChatAgent.MessageHistory(agent=self, messages=messages)
 
     @property
@@ -83,8 +88,12 @@ class LangchainChatAgent(Agent):
     def process_input(self, input):
         self.update_message_history(input)
         myq = Queue()
-        thread =  Thread(target = self.llm.predict_messages, kwargs = 
-                        {'messages': self.message_history, 'tags': [self.session_tag], 'callbacks': [self.StreamingCBH(myq)]})
+        thread =  Thread(target = self.llm.predict_messages, kwargs =
+                        {
+                            'messages': self.message_history.messages,
+                            'tags': [self.session_tag],
+                            'callbacks': [self.StreamingCBH(myq)].extend(self.create_predict_messages_callbacks())
+                        })
         thread.start() 
         words = ''
         while True: 
@@ -103,6 +112,10 @@ class LangchainChatAgent(Agent):
         """
         self.message_history.append(HumanMessage(content=inp))
 
-    def on_message_history_updated(self):
+    def on_message_history_append(self):
         """Subclasses can override to update their state whenever a new message is appended to the `message_history`."""
         pass
+
+    def create_predict_messages_callbacks(self) -> List:
+        """Subclasses can override to create callbacks for the LLM's predict_messages method."""
+        return []
