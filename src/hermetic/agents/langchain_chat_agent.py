@@ -43,9 +43,11 @@ class LangchainChatAgent(Agent):
         def __int__(
                 self,
                 agent: "LangchainChatAgent",
-                messages: Optional[List[Union[AIMessage, HumanMessage, SystemMessage]]] = None):
+                messages: Optional[List[Union[AIMessage, HumanMessage, SystemMessage]]] = []):
             self._agent = agent
-            self._messages: List[Union[AIMessage, HumanMessage, SystemMessage]] = messages[:] if messages else []
+            self._messages: List[Union[AIMessage, HumanMessage, SystemMessage]] = []
+            for msg in messages:
+                self.append(msg)  # So that the `on_message_history_append` callback is called.
 
         @property
         def messages(self):
@@ -53,8 +55,7 @@ class LangchainChatAgent(Agent):
 
         def append(self, msg: Union[AIMessage, HumanMessage, SystemMessage]) -> None:
             self._messages.append(msg)
-            self._agent.on_message_history_append()
-
+            self._agent.on_message_history_append(msg)
 
     def __init__(self, environment, id: str = None):
         super().__init__(environment, id)
@@ -112,8 +113,11 @@ class LangchainChatAgent(Agent):
         """
         self.message_history.append(HumanMessage(content=inp))
 
-    def on_message_history_append(self):
-        """Subclasses can override to update their state whenever a new message is appended to the `message_history`."""
+    def on_message_history_append(self, msg: Union[AIMessage, HumanMessage, SystemMessage]):
+        """Subclasses can override to update their state whenever a new message is appended to the `message_history`.
+
+        :param msg: The message that was appended to the message_history. Should be the same instance as message[-1].
+        """
         pass
 
     def create_predict_messages_callbacks(self) -> List:
