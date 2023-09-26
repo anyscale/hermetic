@@ -43,9 +43,11 @@ class LangchainChatAgent(Agent):
         def __int__(
                 self,
                 agent: "LangchainChatAgent",
-                messages: Optional[List[Union[AIMessage, HumanMessage, SystemMessage]]] = None):
+                messages: Optional[List[Union[AIMessage, HumanMessage, SystemMessage]]] = []):
             self._agent = agent
-            self._messages: List[Union[AIMessage, HumanMessage, SystemMessage]] = messages[:] if messages else []
+            self._messages: List[Union[AIMessage, HumanMessage, SystemMessage]] = []
+            for msg in messages:
+                self.append(msg)  # So that the `on_message_history_append` callback is called.
 
         @property
         def messages(self):
@@ -54,7 +56,6 @@ class LangchainChatAgent(Agent):
         def append(self, msg: Union[AIMessage, HumanMessage, SystemMessage]) -> None:
             self._messages.append(msg)
             self._agent.on_message_history_append()
-
 
     def __init__(self, environment, id: str = None):
         super().__init__(environment, id)
