@@ -39,15 +39,23 @@ class LangchainChatAgent(Agent):
         def on_llm_end(self, response, *, run_id, parent_run_id, **kwargs):
             self.q.put(InputMarker.END)
 
-    def set_llm(self, llm):
-        self.llm = llm
+    @property
+    def llm(self):
+        """Return the LLM to be used for a prediction upon calling process_input.
 
+        Subclasses can override to choose a suitable LLM, for example based on the message_history."""
+        return self._llm
+
+    @llm.setter
+    def llm(self, llm):
+        """If you don't override the `llm` property, make sure to assign an LLM to it before calling `process_input`."""
+        self._llm = llm
 
     def __init__(self, environment, id: str = None):
         super().__init__(environment, id)
         self.message_history = []
         self.session_tag = f'session_{uuid.uuid4()}'
-
+        self._llm = None
 
     def greet(self):
         return None
