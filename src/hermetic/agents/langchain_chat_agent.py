@@ -24,7 +24,6 @@ class LangchainChatAgent(Agent):
         def __init__(self, q):
             self.q = q
             print('Queue created')
-                
 
         def on_llm_new_token(
             self,
@@ -39,39 +38,23 @@ class LangchainChatAgent(Agent):
         def on_llm_end(self, response, *, run_id, parent_run_id, **kwargs):
             self.q.put(InputMarker.END)
 
-    class MessageHistory:
-        def __int__(
-                self,
-                on_message_history_append: Callable[[Union[AIMessage, HumanMessage, SystemMessage]], BaseMessage],
-                messages: Optional[List[Union[AIMessage, HumanMessage, SystemMessage]]] = [],
-        ):
-            self._on_message_history_append = on_message_history_append
-            self._messages: List[Union[AIMessage, HumanMessage, SystemMessage]] = []
-            for msg in messages:
-                self.append(msg)  # So that the `on_message_history_append` callback is called.
-
-        @property
-        def messages(self) -> Tuple[Union[AIMessage, HumanMessage, SystemMessage], ...]:
-            return tuple(self._messages)
-
-        def append(self, msg: Union[AIMessage, HumanMessage, SystemMessage]) -> None:
-            msg = self._on_message_history_append(msg)
-            assert msg, "Empty return from `on_message_history_append`, did you forget to return the message passed in?"
-            self._messages.append(msg)
-
     def __init__(self, environment, id: str = None):
         super().__init__(environment, id)
         self.session_tag = f'session_{uuid.uuid4()}'
-        self._message_history = LangchainChatAgent.MessageHistory(self.on_message_history_append)
+        self._message_history = []
         self._llm = None
 
     @property
     def message_history(self):
-        return self._message_history
+        """Returns an immutable view of the message history. Use `update_message_history` to append messages."""
+        return tuple(self._message_history)
 
     @message_history.setter
     def message_history(self, messages: List[Union[AIMessage, HumanMessage, SystemMessage]]):
-        self._message_history = LangchainChatAgent.MessageHistory(self.on_message_history_append, messages=messages)
+        """Resets the message history to the messages passed, calling `update_message_history` for each of them."""
+        self._message_history = []
+        for msg in messages:
+            self.update_message_history(msg)
 
     @property
     def llm(self):
@@ -89,11 +72,11 @@ class LangchainChatAgent(Agent):
         return None
 
     def process_input(self, input):
-        self.update_message_history(input)
+        self.update_message_history(HumanMessage(content=input))
         myq = Queue()
-        thread =  Thread(target = self.llm.predict_messages, kwargs =
+        thread = Thread(target = self.llm.predict_messages, kwargs =
                         {
-                            'messages': self.message_history.messages,
+                            'messages': self.message_history,
                             'tags': [self.session_tag],
                             'callbacks': [self.StreamingCBH(myq)].extend(self.create_predict_messages_callbacks())
                         })
@@ -106,23 +89,16 @@ class LangchainChatAgent(Agent):
             words += token 
             yield token
 
-        self.message_history.append(AIMessage(content=words))
+        self.update_message_history(AIMessage(content=words))
 
-    def update_message_history(self, inp):
+    def update_message_history(self, msg: Union[AIMessage, HumanMessage, SystemMessage]):
+        """The only correct way to update the message history, allowing subclasses to override and include custom logic.
+
+
+        The message history should not be accessed directly, but only through the property or this method. Otherwise,
+        any custom logic that the subclasses assume will be applied to each newly added message may not be applied.
         """
-        Subclasses of OpenAIChatAgent may want to override this
-        method to do things like add metadata to the message history
-        """
-        self.message_history.append(HumanMessage(content=inp))
-
-    def on_message_history_append(self, msg: Union[AIMessage, HumanMessage, SystemMessage]):
-        """Subclasses can override to update their state whenever a new message is appended to the `message_history`.
-
-        :param msg: The message that was passed to the `message_history.append`. This method is allowed to modify it.
-
-        :return: The message to be actually appended to the `message_history.messages`.
-        """
-        return msg
+        self._message_history.append(msg)
 
     def create_predict_messages_callbacks(self) -> List:
         """Subclasses can override to create callbacks for the LLM's predict_messages method."""
