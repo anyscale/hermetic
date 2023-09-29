@@ -71,8 +71,14 @@ class LangchainChatAgent(Agent):
     def greet(self):
         return None
 
+    def create_human_message_for_input(self, input):
+        """When a human input is passed in to process_input, it turns it to a langchain HumanMessag with this method.
+
+        Subclasses can override to add any custom logic to preprocess the input; e.g., recognizing commands."""
+        return HumanMessage(content=input)
+
     def process_input(self, input):
-        self.update_message_history(HumanMessage(content=input))
+        self.update_message_history(self.create_human_message_for_inpu(input))
         myq = Queue()
         thread = Thread(target = self.llm.predict_messages, kwargs =
                         {
@@ -93,7 +99,6 @@ class LangchainChatAgent(Agent):
 
     def update_message_history(self, msg: Union[AIMessage, HumanMessage, SystemMessage]):
         """The only correct way to update the message history, allowing subclasses to override and include custom logic.
-
 
         The message history should not be accessed directly, but only through the property or this method. Otherwise,
         any custom logic that the subclasses assume will be applied to each newly added message may not be applied.
