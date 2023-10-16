@@ -52,7 +52,7 @@ class GradioPresenter(Presenter):
             my_uuid = gr.State(generate_session_id)
 
 
-            chatbot = gr.Chatbot([['', self.agent.greet()]], elem_id="chatbot")
+            chatbot = gr.Chatbot([['', self.agent.greet()]], elem_id="chatbot", line_breaks=True)
             msg = gr.Textbox(show_label=False, scale=10) 
             with gr.Row():
                 clr = gr.Button(value="Clear", size="sm", scale=1, variant="secondary", elem_id="clr")

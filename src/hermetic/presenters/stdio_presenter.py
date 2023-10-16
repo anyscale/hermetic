@@ -1,11 +1,13 @@
 import sys
 from hermetic.core.agent import Agent
+from hermetic.core.environment import Environment
 
 
 class StdioPresenter:
 
-    def present(self, agent: Agent): 
-        sys.stdout.write(agent.greet()) 
+    def present(self, env: Environment): 
+        agent = env.primary()
+        sys.stdout.write(agent.greet() + '\n') 
         while True: 
             sys.stdout.write('> ')
             inp = input()
