@@ -16,6 +16,14 @@ class OpenAIChatAgent(Agent):
     def process_fn_call(self, orig_question: str, function_name: str, function_arguments: str):
         pass
 
+    def process_message_history(self, message_history):
+        self.message_history = message_history
+        if self.message_history[-1]['role'] == 'user':
+            #This should always be the case
+            return self.process_input(self.message_history[-1]['content'])
+        else:
+            print('Last message should always be a user message')
+
     def process_input(self, input: str):
         self.update_message_history(input)
         if self.functions is None:

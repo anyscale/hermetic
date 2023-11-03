@@ -103,7 +103,6 @@ class GradioPresenter(Presenter):
                     outputs=[msg], 
                     queue = False)
 
-        app.queue(concurrency_count=8)
         if self.favicon_path:
             app.launch(favicon_path=self.favicon_path)
         else:
