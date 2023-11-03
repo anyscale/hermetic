@@ -16,8 +16,8 @@ class OpenAIChatAgent(Agent):
     def process_fn_call(self, orig_question: str, function_name: str, function_arguments: str):
         pass
 
-    def process_message_history(self, message_history):
-        self.message_history = message_history
+    def process_message_history(self, message_history, system_prompt):
+        self.message_history = [{'role': 'system', 'content': system_prompt}] + message_history
         if self.message_history[-1]['role'] == 'user':
             #This should always be the case
             return self.process_input(self.message_history[-1]['content'])
@@ -30,7 +30,8 @@ class OpenAIChatAgent(Agent):
             response = openai.ChatCompletion.create(
             model = self.model,
             messages = self.message_history,
-            stream = True
+            stream = True, 
+            temperature = 0.0,
             )
         else: 
             print("Using functions!" + str(self.functions))
@@ -38,7 +39,8 @@ class OpenAIChatAgent(Agent):
             model = self.model,
             messages = self.message_history,
             stream = True,
-            functions = self.functions
+            functions = self.functions, 
+            temperature = 0.0, 
             )
         words = ''
         function_name = ''
